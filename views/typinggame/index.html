@@ -1,0 +1,202 @@
+<?php
+/**
+ * 
+ * 2012-01-20
+ * 
+ * Original JavaScript and HTML Layout from jQuery Typing Game by Aditia Rahman
+ * http://superdit.com/2011/03/04/jquery-typing-game/
+ * 
+ * Modified by William van Veldhoven william[at]solin.nl for demonstration of 
+ * the 'Soda' MVC plugin for Moodle.
+ *  
+ * This Typing Game Plugin requires the 'Soda' plugin by Solin (http://www.solin.nl) 
+ * in order to work.  
+ * 
+ */
+?>
+<?php $mod_root = $CFG->wwwroot . '/mod/typinggame'; ?>
+    <script type="text/javascript" src="<?php echo $mod_root; ?>/jquery-1.5.min.js"></script>
+    <script type="text/javascript" src="<?php echo $mod_root; ?>/jquery-ui-1.8.9.custom.min.js"></script>
+    <script type="text/javascript">
+    function randomFromTo(from, to){
+        return Math.floor(Math.random() * (to - from + 1) + from);
+    }
+
+    var arrstring = new Array(<?php echo $this->get_words(); ?>);
+
+
+    var score = 0;
+
+    $(document).ready(function() {
+
+        var children = $("#container").children();
+        var child = $("#container div:first-child");
+
+        var currentEl;
+        var currentElPress;
+
+        var win_width = $(window).width();
+        var text_move_px = 500;
+        var box_left = (win_width / 2) - (text_move_px / 2);
+
+        var playGame;
+        var stop;
+        
+        $("#typinggame .animatedbox").css("left", box_left+"px");
+
+        $("#btnplay").click(function() {
+
+            if ($(this).text() == "<?php print_string("play", "typinggame"); ?>") {
+                startPlay();
+                playGame = setInterval(startPlay, 23000);
+                $(this).text("<?php print_string("pause", "typinggame"); ?>");
+            } else if ($(this).text() == "<?php print_string("pause", "typinggame"); ?>") {
+                stop = true;
+                if ($("#container").find(".current").length == 0) {
+                  $(this).text("<?php print_string("play", "typinggame"); ?>");
+                } else {
+                  $(this).text("<?php print_string("wait_a_moment", "typinggame"); ?>");
+                }
+                clearInterval(playGame);
+            }
+            return false;
+        });
+
+        var con_height = $("#container").height();
+        var con_pos = $("#container").position();
+        var min_top = con_pos.top;
+
+        // 56 = animated box top & bottom padding + font size
+        var max_top = min_top + con_height - 56;
+
+        function startPlay() {
+
+            child = $("#container div:first-child");
+            child.addClass("current");
+            currentEl = $(".current");
+            
+            for (i=0; i<children.length; i++) {
+                var delaytime = i * 3500;
+                setTimeout(function() {
+                    randomIndex = randomFromTo(0, arrstring.length - 1);
+                    randomTop = randomFromTo(min_top, max_top);
+                    child.animate({"top": randomTop+"px"}, 'slow');
+                    child.find(".match").text("");
+                    child.find(".unmatch").text(arrstring[randomIndex]);
+                    child.show();
+                    child.animate({
+                       left: "+="+text_move_px
+                    }, 8000, function() {
+                        currentEl.removeClass("current");
+                        currentEl.fadeOut('fast');
+                        currentEl.animate({
+                            left: box_left+"px"
+                        }, 'fast');
+                        if (currentEl.attr("id") == "last") {
+                            child.addClass("current");
+                            currentEl = $(".current");
+                            if (stop) {
+                               $("#btnplay").text("<?php print_string("play", "typinggame"); ?>");
+                            }
+                        } else {
+                            currentEl.next().addClass("current");
+                            currentEl = currentEl.next();
+                        }
+                    });
+                    child = child.next();
+                }, delaytime);
+            }            
+        }
+
+        // on ie $(window).keypress() won't  work
+        $(document).keypress(function(event) {
+            currentElPress = $("#typinggame .current");
+            
+            var matchSpan = currentElPress.find(".match");
+            var unmatchSpan = currentElPress.find(".unmatch");
+            var unmatchText = unmatchSpan.text();
+            var inputChar;
+
+            if ( $.browser.msie || $.browser.opera ) {
+                inputChar = String.fromCharCode(event.which);
+            } else {
+                inputChar = String.fromCharCode(event.charCode);
+            }
+
+            if (inputChar.toLowerCase() == unmatchText.charAt(0).toLowerCase()) {
+                var replaceChar = unmatchText.charAt(0);
+                unmatchSpan.text(unmatchText.replace(replaceChar, ""));
+                matchSpan.append(replaceChar);
+                if (unmatchText.length == 1) {
+                    currentElPress.stop().effect("explode", 500);
+                    currentElPress.animate({
+                        left: box_left+"px"
+                    }, 'fast');
+                    if (currentElPress.attr("id") == "last" && stop) {
+                        $("#btnplay").text("Play");
+                    }
+
+                    currentElPress.removeClass("current");
+                    currentElPress = currentElPress.next();
+                    currentElPress.addClass("current");
+                    currentEl = currentElPress;
+                    score += 50;
+                    $("#score").text(score).effect("highlight", { 
+                        color: '#000000'
+                    }, 1000);
+                } else {
+                    score += 10;
+                    $("#score").text(score);
+                }
+            }
+        });
+    });
+    </script>
+    <?php
+        global $cm;
+        $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+        
+        if (has_capability('mod/typinggame:manage', $context)): 
+    ?>
+  <div id="typinggame_managing">
+    <a href="<?php echo $this->get_url('controller=word'); ?>"><?php echo get_string('manage_game_words', 'typinggame'); ?></a>
+  </div>
+    <?php
+        endif;
+    ?>
+    <div id="typinggame">
+    
+
+      <div id="toolbar">
+          <div id="boxscore">
+            <span>Score:</span>&nbsp;<span id="score">0</span>
+          </div>
+          <div id="boxcontrol">
+            <a href="" id="btnplay"><?php print_string('play','typinggame'); ?></a>
+          </div>
+          <div class="clear">
+              <?php print_string('game_help', 'typinggame'); ?>
+          </div>
+      </div>
+      <div id="container">
+          <div class="animatedbox">
+              <span class="match"></span><span class="unmatch"></span>
+          </div>
+
+          <div class="animatedbox">
+              <span class="match"></span><span class="unmatch"></span>
+          </div>
+
+          <div class="animatedbox">
+              <span class="match"></span><span class="unmatch"></span>
+          </div>
+
+          <div class="animatedbox">
+              <span class="match"></span><span class="unmatch"></span>
+          </div>
+
+          <div class="animatedbox" id="last">
+              <span class="match"></span><span class="unmatch"></span>
+          </div>
+      </div>
+  </div>

@@ -1,0 +1,67 @@
+<?php $mod_root = $CFG->wwwroot . '/mod/typinggame'; ?>
+<?php
+    global $cm;
+    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+    
+    if (!has_capability('mod/typinggame:manage', $context)) { return; }  
+?>
+
+<h1><?php print_string('words', 'typinggame') ?> </h1>
+
+<div class="managing">
+<?php
+    global $cm;
+    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+    
+    if (has_capability('mod/typinggame:manage', $context)): 
+?>
+<a href="<?php echo $this->get_url('controller=typinggame'); ?>">&lt; <?php print_string('play_the_game', 'typinggame'); ?></a>
+<?php
+    endif;
+?>
+</div>
+
+<form method="post">
+<?= $this->create_hidden_fields(array('action' => ($record_id) ? 'update' : 'create')); ?>
+<table id="typinggame_words">
+    <tr>
+        <th><?php print_string('word', 'typinggame') ?></th>
+    </tr>
+<?php
+$error_class = (soda_error::class_in_error('word')) ? ' error' : '';
+foreach($records as $listed_record) {
+    if ($listed_record->id == $record_id) {
+        if ($record) $listed_record = $record;
+        echo "<tr>
+                <td class='soda{$error_class}'>
+                    <input type='text' value='{$listed_record->word}' name='record[word]'>
+                    <input type='hidden' value='{$record_id}' name='record_id'>
+                </td>";
+        echo "<td><input type='submit' name='submit' value='" . get_string('update') . "'/></td>";
+        echo "<td colspan='2'><input value='" . get_string('cancel') ."' type='button' onclick='window.location=\"" . $this->get_url() . "\"'/></td></tr>";
+        continue;
+        }
+    ?>
+    <tr>
+        <td><?= $listed_record->word ?></td>
+        <td><a onclick="<?= $this->post_to_url_js(array('word_id' => $listed_record->id)) ?>" href="#"><?= get_string('delete', 'typinggame') ?></a></td>
+        <td><a href='<?= $this->get_url("word_id={$listed_record->id}") ?>'><?= get_string('edit', 'typinggame') ?></a></td>
+    </tr>
+<?php
+}
+?>
+<?php if (! $record_id ) { ?>
+<tr>
+    <td class='soda<?= $error_class ?>'><input id="new_record_word" type='text' value='<?= ($record) ? $record->word : "" ?>' name='record[word]' /></td>
+    <td colspan='3'><input type='submit' name='submit' value='<?= get_string('add') ?>'/></td>
+</tr>
+<?php } ?>
+</table>
+</form>
+
+<script type="text/javascript" src="<?php echo $mod_root; ?>/jquery-1.5.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#new_record_word').focus();
+    });
+</script>
