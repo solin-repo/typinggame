@@ -39,6 +39,7 @@ class mod_typinggame_mod_form extends moodleform_mod {
     /**
 * Defines forms elements
 */
+
     public function definition() {
 
         $mform = $this->_form;
@@ -64,10 +65,12 @@ class mod_typinggame_mod_form extends moodleform_mod {
         //-------------------------------------------------------------------------------
         // Adding the rest of newmodule settings, spreeading all them into this fieldset
         // or adding more fieldsets ('header' elements) if needed for better logic
+        /*
         $mform->addElement('static', 'label1', 'newmodulesetting1', 'Your newmodule fields go here. Replace me!');
 
         $mform->addElement('header', 'newmodulefieldset', get_string('newmodulefieldset', 'newmodule'));
         $mform->addElement('static', 'label2', 'newmodulesetting2', 'Your newmodule fields go here. Replace me!');
+         */
 
         //-------------------------------------------------------------------------------
         // add standard elements, common to all modules
