@@ -4,7 +4,7 @@
     $string['typinggame'] = "Typing Game";
 	$string['modulename'] = "Typing Game";
 	$string['modulenameplural'] = 'Typing Games';
-	$string['modulename_help'] = 'Manage yout Typing Games';
+	$string['modulename_help'] = 'Manage your Typing Games';
 	$string['newmodulefieldset'] = 'Custom example fieldset';
 	$string['newmodulename'] = 'New Typing Game';
 	$string['newmodulename_help'] = 'Manage your Typing Games';
@@ -22,6 +22,7 @@
 	$string['pause'] = 'Pause';
 	$string['wait_a_moment'] = 'Wait a moment';
     $string['game_help'] = 'Press "Play" to start the game, type the text in the blue animated box';
-	$string[''] = '';
+	$string['typinggame:manage'] = 'Edit a typing game';
+	$string['typinggame:addinstance'] = 'Add a new typing game';
 
 ?>

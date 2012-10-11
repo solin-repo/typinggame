@@ -22,6 +22,7 @@
 	$string['pause'] = 'Pauze';
 	$string['wait_a_moment'] = 'Even geduld';
     $string['game_help'] = 'Druk op  "Start" om het spel te spelen, en typ de tekst over uit het blauwe vlak';
-	$string[''] = '';
+	$string['typinggame:manage'] = 'Bewerk een type-spel';
+	$string['typinggame:addinstance'] = 'Voeg een nieuw type-spel toe';
 
 ?>
